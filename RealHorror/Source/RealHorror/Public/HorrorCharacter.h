@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "HorrorCharacter.generated.h"
 
 UCLASS()
@@ -32,8 +34,19 @@ private:
 
 	void LookUp(float AxisValue);
 	void LookRight(float AxisValue);
+	void Interact();
+private:
+	void FindFocusTarget();
+	
 
 private:
 	bool bIsCanMove = true;
 	bool bIsCameraCanMove = true;
+
+	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
+	UCameraComponent* CameraComponent = nullptr;
+	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
+	USpringArmComponent* SpringArmComponent = nullptr;
+
+	class IInteractInterface* FocusActor = nullptr;
 };

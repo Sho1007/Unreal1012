@@ -2,6 +2,8 @@
 
 
 #include "HorrorCharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "../Public/InteractInterface.h"
 
 // Sets default values
 AHorrorCharacter::AHorrorCharacter()
@@ -10,6 +12,14 @@ AHorrorCharacter::AHorrorCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
+	SpringArmComponent->SetupAttachment(RootComponent);
+	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->TargetArmLength = 10.0f;
+	SpringArmComponent->SetRelativeLocation(FVector(20, 0, 70));
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
 // Called when the game starts or when spawned
@@ -23,7 +33,6 @@ void AHorrorCharacter::BeginPlay()
 void AHorrorCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -37,6 +46,7 @@ void AHorrorCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("LookUp", this, &AHorrorCharacter::LookUp);
 	PlayerInputComponent->BindAxis("LookRight", this, &AHorrorCharacter::LookRight);
 
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AHorrorCharacter::Interact);
 }
 
 void AHorrorCharacter::MoveForward(float AxisValue)
@@ -50,6 +60,8 @@ void AHorrorCharacter::MoveForward(float AxisValue)
 	// Get Forward Vector
 	const FVector Direction = FRotationMatrix(YawRotaion).GetUnitAxis(EAxis::X);
 	AddMovementInput(Direction, AxisValue);
+
+	FindFocusTarget();
 }
 
 void AHorrorCharacter::MoveRight(float AxisValue)
@@ -63,19 +75,66 @@ void AHorrorCharacter::MoveRight(float AxisValue)
 	// Get Forward Vector
 	const FVector Direction = FRotationMatrix(YawRotaion).GetUnitAxis(EAxis::Y);
 	AddMovementInput(Direction, AxisValue);
+
+	FindFocusTarget();
 }
 
 void AHorrorCharacter::LookUp(float AxisValue)
 {
 	if (!Controller || !AxisValue) return;
 	if (bIsCameraCanMove)
+	{
 		AddControllerPitchInput(AxisValue);
+		FindFocusTarget();
+	}
+		
 }
 
 void AHorrorCharacter::LookRight(float AxisValue)
 {
 	if (!Controller || !AxisValue) return;
 	if (bIsCameraCanMove)
+	{
 		AddControllerYawInput(AxisValue);
+		FindFocusTarget();
+	}
+		
+}
+
+void AHorrorCharacter::Interact()
+{
+	if (FocusActor)
+	{
+		FocusActor->Interact();
+	}
+}
+
+void AHorrorCharacter::FindFocusTarget()
+{
+	FHitResult HitResult;
+	FVector Start = CameraComponent->GetComponentLocation();
+	FVector End = Start + CameraComponent->GetForwardVector() * 100.0f;
+	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, { this }, EDrawDebugTrace::None, HitResult, true))
+	{
+		IInteractInterface* Object = Cast<IInteractInterface>(HitResult.GetActor());
+		if (Object)
+		{
+			if (FocusActor)
+			{
+				if (FocusActor == Object) return;
+				else FocusActor->Focus(false);
+			}
+			FocusActor = Object;
+			FocusActor->Focus(true);
+			
+			return;
+		}
+	}
+
+	if (FocusActor)
+	{
+		FocusActor->Focus(false);
+		FocusActor = nullptr;
+	}
 }
 
