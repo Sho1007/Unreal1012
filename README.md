@@ -4,7 +4,7 @@
 https://trello.com/w/unrealportfoilorealhorror/home
 
 ## 프로젝트 문서
-* [포트폴리오 계획서] (https://github.com/sho1007/Unreal2210/blob/main/Real_Horror_포트폴리오_계획서.pdf)
+* [포트폴리오 계획서](https://github.com/Sho1007/Unreal2210/blob/main/Real_Horror_%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4_%EA%B3%84%ED%9A%8D%EC%84%9C.pdf)
 
 ## 깨달은 점
 1. Custom Depth
