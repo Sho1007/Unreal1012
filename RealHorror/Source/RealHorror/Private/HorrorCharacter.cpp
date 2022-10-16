@@ -20,6 +20,10 @@ AHorrorCharacter::AHorrorCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	InspectingLocation = CreateDefaultSubobject<USceneComponent>("InspectingLocation");
+	InspectingLocation->SetupAttachment(CameraComponent);
+	InspectingLocation->SetRelativeLocation(FVector(100, -10, 0));
 }
 
 // Called when the game starts or when spawned
@@ -113,7 +117,7 @@ void AHorrorCharacter::FindFocusTarget()
 {
 	FHitResult HitResult;
 	FVector Start = CameraComponent->GetComponentLocation();
-	FVector End = Start + CameraComponent->GetForwardVector() * 100.0f;
+	FVector End = Start + CameraComponent->GetForwardVector() * 300.0f;
 	if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, { this }, EDrawDebugTrace::None, HitResult, true))
 	{
 		IInteractInterface* Object = Cast<IInteractInterface>(HitResult.GetActor());

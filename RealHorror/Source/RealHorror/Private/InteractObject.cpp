@@ -21,6 +21,7 @@ AInteractObject::AInteractObject()
 void AInteractObject::BeginPlay()
 {
 	Super::BeginPlay();
+	SetActorTickEnabled(false);
 }
 
 void AInteractObject::Interact()
@@ -30,9 +31,6 @@ void AInteractObject::Interact()
 
 void AInteractObject::Focus(bool value)
 {
-	StaticMeshComponent->bRenderCustomDepth = true;
-	StaticMeshComponent->CustomDepthStencilValue = 1;
-
 	StaticMeshComponent->SetCustomDepthStencilValue((int)value);
 	UInteractWidget* Widget = Cast<UInteractWidget>(WidgetComponent->GetWidget());
 	if (Widget)

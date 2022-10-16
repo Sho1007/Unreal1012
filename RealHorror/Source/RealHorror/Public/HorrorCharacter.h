@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+
 #include "HorrorCharacter.generated.h"
 
 UCLASS()
@@ -47,6 +49,13 @@ private:
 	UCameraComponent* CameraComponent = nullptr;
 	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
 	USpringArmComponent* SpringArmComponent = nullptr;
+	
+
 
 	class IInteractInterface* FocusActor = nullptr;
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	USceneComponent* InspectingLocation = nullptr;
+
 };
