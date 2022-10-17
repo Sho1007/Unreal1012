@@ -16,14 +16,30 @@ void ACollectableObject::BeginPlay()
 
 void ACollectableObject::Interact()
 {
+	Inspect();
+}
+
+void ACollectableObject::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (PC->WasInputKeyJustPressed(EKeys::E))
+		DropDown();
+	else
+		RotateMesh();
+}
+
+void ACollectableObject::Inspect()
+{
 	if (Player && Player->IsValidLowLevelFast())
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Cast Successed"));
 		Focus(false);
-		WidgetComponent->SetVisibility(false, false);
-		
+		WidgetComponent->SetVisibility(false);
+
 		FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
 		AttachToComponent(Player->InspectingLocation, Rules);
+
+		RelativeScale = GetActorRelativeScale3D();
 
 		StaticMeshComponent->SetSimulatePhysics(false);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -32,33 +48,49 @@ void ACollectableObject::Interact()
 		FTimerHandle WaitTimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(WaitTimerHandle, FTimerDelegate::CreateLambda([&]() {
 			SetActorTickEnabled(true);
-		}), 0.5f, false);
+			}), 0.5f, false);
 	}
 }
 
-void ACollectableObject::Tick(float DeltaTime)
+void ACollectableObject::DropDown()
 {
-	Super::Tick(DeltaTime);
+	SetActorTickEnabled(false);
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	this->DisableInput(PC);
+	Player->EnableInput(PC);
+	FDetachmentTransformRules Rules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
+	DetachFromActor(Rules);
+	WidgetComponent->SetVisibility(true);
+	SetActorTransform(OriginTransform);
+	Focus(true);
+}
 
+void ACollectableObject::RotateMesh()
+{
 	if (PC->IsInputKeyDown(EKeys::LeftMouseButton))
 	{
 		float MouseX, MouseY;
 		PC->GetInputMouseDelta(MouseX, MouseY);
 
-		FTransform Transform = StaticMeshComponent->GetRelativeTransform();
-		Transform.ConcatenateRotation(FRotator(0, -MouseX * 2, 0).Quaternion());
-		Transform.ConcatenateRotation(FRotator(-MouseY * 2, 0, 0).Quaternion());
-		StaticMeshComponent->SetRelativeTransform(Transform);
+		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0, MouseX * -2.0f, 0)));
+		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0, 0, MouseY * 2.0f)));
 	}
-	if (PC->WasInputKeyJustPressed(EKeys::E))
+
+	if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown))
 	{
-		SetActorTickEnabled(false);
-		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		this->DisableInput(PC);
-		Player->EnableInput(PC);
-		DetachRootComponentFromParent(false);
-		WidgetComponent->SetVisibility(true, false);
-		SetActorTransform(OriginTransform);
-		Focus(true);
+		if (ZoomLevel > 0)
+		{
+			ZoomLevel -= 1;
+			SetActorScale3D(RelativeScale + (ZoomLevel * ZoomSize));
+		}
+	}
+
+	if (PC->WasInputKeyJustPressed(EKeys::MouseScrollUp))
+	{
+		if (ZoomLevel < 10)
+		{
+			ZoomLevel += 1;
+			SetActorScale3D(RelativeScale + (ZoomLevel * ZoomSize));
+		}
 	}
 }

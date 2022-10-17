@@ -6,6 +6,10 @@ https://trello.com/w/unrealportfoilorealhorror/home
 ## 프로젝트 문서
 * [포트폴리오 계획서](https://github.com/Sho1007/Unreal2210/blob/main/Real_Horror_%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4_%EA%B3%84%ED%9A%8D%EC%84%9C.pdf)
 
+## 개발 진행 상황
+* Collectable Object Inspect 기능 구현 중
+    * Rotate / Zoom 기능 구현 완료
+
 ## 깨달은 점
 1. Custom Depth
     1. Custom Depth Stencil 을 활용하고 싶다면
@@ -25,4 +29,9 @@ https://trello.com/w/unrealportfoilorealhorror/home
     StaticMeshComponent->SetRenderCustomDepth(true);                // 작동 O
     StaticMeshComponent->CustomDepthStencilValue = 1;               // 작동 X
     StaticMeshComponent->SetCustomDepthStencilValue(1);             // 작동 O
+    ```
+2. Rotater + Rotator
+    ```c++
+        // 단순 A + B 로는 원하는 수치만 더할 뿐 원하는 결과가 나오지 않음
+        UKismetMathLibrary::ComposeRotators(A, B);
     ```
