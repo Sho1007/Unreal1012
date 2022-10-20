@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InteractObject.h"
+
 #include "CollectableObject.generated.h"
 
 /**
@@ -14,6 +15,9 @@ class REALHORROR_API ACollectableObject : public AInteractObject
 {
 	GENERATED_BODY()
 	
+public:
+	ACollectableObject();
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Interact() override;
@@ -21,15 +25,20 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	virtual FText GetItemName() override { return ItemName; }
+	virtual FText GetItemDiscription() override { return ItemDiscription; }
 private:
 	void Inspect();
 	void DropDown();
 	void RotateMesh();
+protected:
+	APlayerController* PC = nullptr;
+	class AHorrorCharacter* Player = nullptr;
+	FText ItemName;
+	FText ItemDiscription;
 private:
 	FTransform OriginTransform;
 	FVector RelativeScale;
-	APlayerController* PC = nullptr;
-	class AHorrorCharacter* Player = nullptr;
 	int ZoomLevel = 0;
-	float ZoomSize = 0.05f;
+	float ZoomSize = 0.02f;
 };

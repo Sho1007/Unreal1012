@@ -5,6 +5,12 @@
 #include "../Public/HorrorCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
+ACollectableObject::ACollectableObject() : Super()
+{
+	ItemName = FText::FromName("CollectableObject");
+	ItemDiscription = FText::FromName("DiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTestDiscriptionTest");
+}
+
 void ACollectableObject::BeginPlay()
 {
 	Super::BeginPlay();
@@ -35,8 +41,7 @@ void ACollectableObject::Inspect()
 	{
 		Focus(false);
 		WidgetComponent->SetVisibility(false);
-
-		FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+		FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, true);
 		AttachToComponent(Player->InspectingLocation, Rules);
 
 		RelativeScale = GetActorRelativeScale3D();
@@ -45,15 +50,20 @@ void ACollectableObject::Inspect()
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Player->DisableInput(PC);
 		this->EnableInput(PC);
+
+		// Input Switch
 		FTimerHandle WaitTimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(WaitTimerHandle, FTimerDelegate::CreateLambda([&]() {
 			SetActorTickEnabled(true);
 			}), 0.5f, false);
+
+		Player->ShowInspectWidget(ItemName, ItemDiscription);
 	}
 }
 
 void ACollectableObject::DropDown()
 {
+	Player->HideInspectWidget();
 	SetActorTickEnabled(false);
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	this->DisableInput(PC);
@@ -74,6 +84,15 @@ void ACollectableObject::RotateMesh()
 
 		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0, MouseX * -2.0f, 0)));
 		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0, 0, MouseY * 2.0f)));
+	}
+
+	if (PC->IsInputKeyDown(EKeys::Up))
+	{
+		Player->ScrollUp();
+	}
+	else if (PC->IsInputKeyDown(EKeys::Down))
+	{
+		Player->ScrollDown();
 	}
 
 	if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown))

@@ -24,4 +24,6 @@ class REALHORROR_API IInteractInterface
 public:
 	virtual void Interact() = 0;
 	virtual void Focus(bool value) = 0;
+	virtual FText GetItemName() { return FText(); };
+	virtual FText GetItemDiscription() { return FText(); };
 };

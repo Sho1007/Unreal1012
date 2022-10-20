@@ -3,6 +3,7 @@
 
 #include "HorrorCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "../Public/InteractInterface.h"
 
 // Sets default values
@@ -30,7 +31,10 @@ AHorrorCharacter::AHorrorCharacter()
 void AHorrorCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InspectWidget = CreateWidget<UInspectWidget>(Cast<APlayerController>(GetController()), InspectWidgetClass);
+	InspectWidget->AddToViewport();
+	InspectWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 // Called every frame
@@ -51,6 +55,18 @@ void AHorrorCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("LookRight", this, &AHorrorCharacter::LookRight);
 
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AHorrorCharacter::Interact);
+}
+
+void AHorrorCharacter::ShowInspectWidget(FText ItemName, FText ItemDiscription)
+{
+	InspectWidget->SetItemName(ItemName);
+	InspectWidget->SetItemDiscription(ItemDiscription);
+	InspectWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AHorrorCharacter::HideInspectWidget()
+{
+	InspectWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AHorrorCharacter::MoveForward(float AxisValue)
@@ -102,7 +118,6 @@ void AHorrorCharacter::LookRight(float AxisValue)
 		AddControllerYawInput(AxisValue);
 		FindFocusTarget();
 	}
-		
 }
 
 void AHorrorCharacter::Interact()

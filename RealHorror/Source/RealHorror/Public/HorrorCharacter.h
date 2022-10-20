@@ -7,6 +7,9 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "../Public/InspectWidget.h"
+
+#include "Components/SceneCaptureComponent2D.h"
 
 #include "HorrorCharacter.generated.h"
 
@@ -32,6 +35,11 @@ public:
 
 	FTransform GetCameraTransform() { return CameraComponent->GetComponentTransform(); }
 
+	// Inspecting
+	void ShowInspectWidget(FText ItemName, FText ItemDiscription);
+	void HideInspectWidget();
+	void ScrollUp() { InspectWidget->ScrollUp(); }
+	void ScrollDown() { InspectWidget->ScrollDown(); }
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
@@ -51,13 +59,12 @@ private:
 	UCameraComponent* CameraComponent = nullptr;
 	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
 	USpringArmComponent* SpringArmComponent = nullptr;
-	
-
 
 	class IInteractInterface* FocusActor = nullptr;
-
+	UInspectWidget* InspectWidget = nullptr;
+	UPROPERTY(meta = (AllowPrivateAccess = true), EditDefaultsOnly)
+	TSubclassOf<UInspectWidget> InspectWidgetClass;
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* InspectingLocation = nullptr;
-
 };
