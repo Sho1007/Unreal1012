@@ -23,7 +23,19 @@ class REALHORROR_API IInteractInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void Interact() = 0;
-	virtual void Focus(bool value) = 0;
-	virtual FText GetItemName() { return FText(); };
-	virtual FText GetItemDiscription() { return FText(); };
+	virtual void Focus(bool Value) {}
+	virtual FText GetItemName() { return FText(); }
+	virtual FText GetItemDiscription() { return FText(); }
+	
+	virtual void SetInput(bool Value) {}
+	// Inspect Widget
+	virtual USceneComponent* GetInspectLocation() { return nullptr; }
+	virtual void ScrollUp() {}
+	virtual void ScrollDown() {}
+	virtual void ShowInspectWidget(FText ItemName, FText ItemDiscription) {};
+	virtual void HideInspectWidget() {}
+
+	// Hidable Object
+	virtual void Hide() {}
+	virtual void UnHide(float Time = -1.0f) {}
 };

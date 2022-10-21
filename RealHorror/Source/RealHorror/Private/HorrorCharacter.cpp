@@ -5,6 +5,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../Public/InteractInterface.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AHorrorCharacter::AHorrorCharacter()
@@ -35,6 +36,8 @@ void AHorrorCharacter::BeginPlay()
 	InspectWidget = CreateWidget<UInspectWidget>(Cast<APlayerController>(GetController()), InspectWidgetClass);
 	InspectWidget->AddToViewport();
 	InspectWidget->SetVisibility(ESlateVisibility::Hidden);
+
+	PC = Cast<APlayerController>(GetController());
 }
 
 // Called every frame
@@ -67,6 +70,35 @@ void AHorrorCharacter::ShowInspectWidget(FText ItemName, FText ItemDiscription)
 void AHorrorCharacter::HideInspectWidget()
 {
 	InspectWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void AHorrorCharacter::Hide()
+{
+	bIsHide = true;
+	DisableInput(GetWorld()->GetFirstPlayerController());
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorHiddenInGame(true);
+}
+
+void AHorrorCharacter::UnHide(float Time)
+{
+	
+	PC->SetViewTargetWithBlend(this, Time);
+	FTimerHandle WaitHandle;
+	GetWorld()->GetTimerManager().SetTimer(WaitHandle, FTimerDelegate::CreateLambda([&]()
+		{
+			SetActorHiddenInGame(false);
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			EnableInput(PC);
+		}
+	), Time, false);
+	bIsHide = false;
+}
+
+void AHorrorCharacter::SetInput(bool Value)
+{
+	if (Value) EnableInput(GetWorld()->GetFirstPlayerController());
+	else DisableInput(GetWorld()->GetFirstPlayerController());
 }
 
 void AHorrorCharacter::MoveForward(float AxisValue)

@@ -32,7 +32,12 @@ public:
 
 protected:
 	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<USceneComponent> Root = nullptr;
+	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* StaticMeshComponent = nullptr;
 	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
 	UWidgetComponent* WidgetComponent = nullptr;
+
+	APlayerController* PC = nullptr;
+	IInteractInterface* Player = nullptr;
 };

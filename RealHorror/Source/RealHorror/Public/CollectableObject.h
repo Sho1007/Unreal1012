@@ -32,8 +32,6 @@ private:
 	void DropDown();
 	void RotateMesh();
 protected:
-	APlayerController* PC = nullptr;
-	class AHorrorCharacter* Player = nullptr;
 	FText ItemName;
 	FText ItemDiscription;
 private:

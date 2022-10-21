@@ -2,7 +2,6 @@
 
 
 #include "CollectableObject.h"
-#include "../Public/HorrorCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ACollectableObject::ACollectableObject() : Super()
@@ -16,8 +15,6 @@ void ACollectableObject::BeginPlay()
 	Super::BeginPlay();
 
 	OriginTransform = GetActorTransform();
-	PC = GetWorld()->GetFirstPlayerController();
-	Player = Cast<AHorrorCharacter>(PC->GetCharacter());
 }
 
 void ACollectableObject::Interact()
@@ -37,18 +34,18 @@ void ACollectableObject::Tick(float DeltaTime)
 
 void ACollectableObject::Inspect()
 {
-	if (Player && Player->IsValidLowLevelFast())
+	if (Player)
 	{
 		Focus(false);
 		WidgetComponent->SetVisibility(false);
 		FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, true);
-		AttachToComponent(Player->InspectingLocation, Rules);
+		AttachToComponent(Player->GetInspectLocation(), Rules);
 
 		RelativeScale = GetActorRelativeScale3D();
 
 		StaticMeshComponent->SetSimulatePhysics(false);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		Player->DisableInput(PC);
+		Player->SetInput(false);
 		this->EnableInput(PC);
 
 		// Input Switch
@@ -67,7 +64,7 @@ void ACollectableObject::DropDown()
 	SetActorTickEnabled(false);
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	this->DisableInput(PC);
-	Player->EnableInput(PC);
+	Player->SetInput(true);
 	FDetachmentTransformRules Rules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
 	DetachFromActor(Rules);
 	WidgetComponent->SetVisibility(true);

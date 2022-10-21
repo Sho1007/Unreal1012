@@ -3,6 +3,7 @@
 
 #include "InteractObject.h"
 #include "../Public/InteractWidget.h"
+#include "../Public/HorrorCharacter.h"
 
 // Sets default values
 AInteractObject::AInteractObject()
@@ -10,9 +11,11 @@ AInteractObject::AInteractObject()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Root = CreateDefaultSubobject<USceneComponent>("RootComponent");
+	SetRootComponent(Root);
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	StaticMeshComponent->SetRenderCustomDepth(true);
-	SetRootComponent(StaticMeshComponent);
+	StaticMeshComponent->SetupAttachment(RootComponent);
 	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>("WidgetComponent");
 	WidgetComponent->SetupAttachment(RootComponent);
 }
@@ -22,6 +25,8 @@ void AInteractObject::BeginPlay()
 {
 	Super::BeginPlay();
 	SetActorTickEnabled(false);
+	PC = GetWorld()->GetFirstPlayerController();
+	Player = Cast<IInteractInterface>(PC->GetCharacter());
 }
 
 void AInteractObject::Interact()

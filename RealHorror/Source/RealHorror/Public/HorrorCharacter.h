@@ -8,13 +8,14 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "../Public/InspectWidget.h"
-
 #include "Components/SceneCaptureComponent2D.h"
+
+#include "../Public/InteractInterface.h"
 
 #include "HorrorCharacter.generated.h"
 
 UCLASS()
-class REALHORROR_API AHorrorCharacter : public ACharacter
+class REALHORROR_API AHorrorCharacter : public ACharacter, public IInteractInterface
 {
 	GENERATED_BODY()
 
@@ -34,26 +35,36 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	FTransform GetCameraTransform() { return CameraComponent->GetComponentTransform(); }
-
-	// Inspecting
-	void ShowInspectWidget(FText ItemName, FText ItemDiscription);
-	void HideInspectWidget();
-	void ScrollUp() { InspectWidget->ScrollUp(); }
-	void ScrollDown() { InspectWidget->ScrollDown(); }
+protected:
+	// Interact Interface
+	virtual void Interact() override;
+	virtual USceneComponent* GetInspectLocation() override { return InspectingLocation; }
+	virtual void SetInput(bool Value) override;
+	virtual void ScrollUp() override { InspectWidget->ScrollUp(); }
+	virtual void ScrollDown() override { InspectWidget->ScrollDown(); }
+	virtual void ShowInspectWidget(FText ItemName, FText ItemDiscription) override;
+	virtual void HideInspectWidget() override;
+	// Hidable Object
+	virtual void Hide() override;
+	virtual void UnHide(float Time = -1.0f) override;
 private:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 
 	void LookUp(float AxisValue);
 	void LookRight(float AxisValue);
-	void Interact();
+	
 private:
 	void FindFocusTarget();
 	
 
 private:
+	bool bIsHide = false;
+
 	bool bIsCanMove = true;
 	bool bIsCameraCanMove = true;
+
+	APlayerController* PC = nullptr;
 
 	UPROPERTY(meta = (AllowPrivateAccess = true), BlueprintReadWrite, EditAnywhere)
 	UCameraComponent* CameraComponent = nullptr;
