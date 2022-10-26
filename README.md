@@ -30,7 +30,7 @@ https://trello.com/w/unrealportfoilorealhorror/home
     StaticMeshComponent->CustomDepthStencilValue = 1;               // 작동 X
     StaticMeshComponent->SetCustomDepthStencilValue(1);             // 작동 O
     ```
-2. Rotater + Rotator
+2. Rotater + Rotator 
     ```c++
         // 단순 A + B 로는 원하는 수치만 더할 뿐 원하는 결과가 나오지 않음
         UKismetMathLibrary::ComposeRotators(A, B);
